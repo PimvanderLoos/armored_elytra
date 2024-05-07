@@ -1,9 +1,11 @@
 package com.mrmelon54.ArmoredElytra.items;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mrmelon54.ArmoredElytra.ArmoredElytra;
 import com.mrmelon54.ArmoredElytra.ChestplateWithElytraItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -42,6 +44,20 @@ public record Pim16aap2SpigotArmoredElytraItem(ItemStack stack) implements Chest
             subtag.putInt("color", color);
             chestplateStack.addTagElement("display", subtag);
         }
+
+        CompoundTag trimNbt = getTrimNbt(pbv);
+        if (trimNbt != null) chestplateStack.setTag(trimNbt);
+
         return chestplateStack;
+    }
+
+    private CompoundTag getTrimNbt(CompoundTag pbv) {
+        String trimString = pbv.getString("armoredelytra:armor_trim");
+        if (trimString.isEmpty()) return null;
+        try {
+            return TagParser.parseTag(trimString);
+        } catch (CommandSyntaxException e) {
+            throw new RuntimeException("Failed to get trim nbt", e);
+        }
     }
 }
